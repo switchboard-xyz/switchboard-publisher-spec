@@ -12,55 +12,102 @@ This API provides real-time and historical asset pricing data with comprehensive
 
 Returns a snapshot of available assets with current pricing and metadata for a specific category. Optionally filter to specific assets.
 
-**Endpoint:** `GET /api/assets`
+**Endpoint:** `POST /api/assets`
 
 **Base URL:** `https://api.example.com`
 
 **Full URL:** `https://api.example.com/api/assets`
 
-**Query Parameters:**
+**Request Body:**
+
+```json
+{
+  "category": "crypto",
+  "assets": ["BTC-USD", "ETH-USD"],  // Optional
+  "include_pricing": true,            // Optional
+  "verbose": true                     // Optional
+}
+```
+
+**Request Body Parameters:**
 
 | Parameter | Type | Description | Required |
 |-----------|------|-------------|----------|
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
-| `assets` | string | Comma-separated list of specific assets to retrieve | No |
+| `assets` | string[] | Array of specific assets to retrieve | No |
 | `include_pricing` | boolean | Include API usage pricing information | No |
+| `verbose` | boolean | Include trading hours and active status information | No |
 
 **Example Requests:**
 
-- All crypto assets: `GET https://api.example.com/api/assets?category=crypto`
-- Specific crypto assets: `GET https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD`
-- Crypto with pricing: `GET https://api.example.com/api/assets?category=crypto&include_pricing=true`
-- All equity assets: `GET https://api.example.com/api/assets?category=equity`
-- Specific stocks: `GET https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT`
+All crypto assets:
+```json
+POST https://api.example.com/api/assets
+{
+  "category": "crypto"
+}
+```
+
+Specific crypto assets with pricing:
+```json
+POST https://api.example.com/api/assets
+{
+  "category": "crypto",
+  "assets": ["BTC-USD", "ETH-USD", "SOL-USD"],
+  "include_pricing": true
+}
+```
 
 #### Get Specific Asset
 
 Returns pricing and metadata for a specific asset.
 
-**Endpoint:** `GET /api/assets/{asset_name}`
+**Endpoint:** `POST /api/asset`
 
 **Base URL:** `https://api.example.com`
 
-**Path Parameters:**
+**Full URL:** `https://api.example.com/api/asset`
+
+**Request Body:**
+
+```json
+{
+  "asset_name": "BTC-USD",
+  "category": "crypto",
+  "include_pricing": true,  // Optional
+  "verbose": true           // Optional
+}
+```
+
+**Request Body Parameters:**
 
 | Parameter | Type | Description | Required |
 |-----------|------|-------------|----------|
 | `asset_name` | string | Asset symbol or name (e.g., "BTC-USD", "ETH-USD") | **Yes** |
-
-**Query Parameters:**
-
-| Parameter | Type | Description | Required |
-|-----------|------|-------------|----------|
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
 | `include_pricing` | boolean | Include API usage pricing information | No |
+| `verbose` | boolean | Include trading hours and active status information | No |
 
 **Example Requests:**
 
-- Bitcoin: `GET https://api.example.com/api/assets/BTC-USD?category=crypto`
-- Bitcoin with pricing: `GET https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true`
-- Apple Stock: `GET https://api.example.com/api/assets/AAPL?category=equity`
-- EUR/USD: `GET https://api.example.com/api/assets/EUR-USD?category=forex`
+Bitcoin:
+```json
+POST https://api.example.com/api/asset
+{
+  "asset_name": "BTC-USD",
+  "category": "crypto"
+}
+```
+
+Bitcoin with pricing:
+```json
+POST https://api.example.com/api/asset
+{
+  "asset_name": "BTC-USD",
+  "category": "crypto",
+  "include_pricing": true
+}
+```
 
 **Response Format (List):**
 
@@ -144,6 +191,63 @@ Returns pricing and metadata for a specific asset.
 }
 ```
 
+**Response Format (Single Asset with Verbose Mode):**
+
+```json
+{
+  "name": "BTC/USD",
+  "category": "crypto",
+  "price_mantissa": "6342000000",
+  "decimals": 8,
+  "timestamp_ms": 1719964800123,
+  "active_hours": {
+    "schedule": "* * * * *",
+    "timezone": "UTC",
+    "description": "24/7 trading"
+  },
+  "is_active": true,
+  "after_hours_available": false
+}
+```
+
+**Response Format (Equity Asset with Verbose Mode):**
+
+```json
+{
+  "name": "AAPL",
+  "category": "equity",
+  "price_mantissa": "17500",
+  "decimals": 2,
+  "timestamp_ms": 1719964800123,
+  "active_hours": {
+    "schedule": "30-59 9 * * 1-5, 0-59 10-15 * * 1-5, 0 16 * * 1-5",
+    "timezone": "America/New_York",
+    "description": "NYSE hours: 9:30 AM - 4:00 PM ET, Monday-Friday"
+  },
+  "is_active": false,
+  "after_hours_available": true
+}
+```
+
+**Response Format (Forex Asset with Verbose Mode):**
+
+```json
+{
+  "name": "EUR/USD",
+  "category": "forex",
+  "price_mantissa": "108753",
+  "decimals": 5,
+  "timestamp_ms": 1719964800123,
+  "active_hours": {
+    "schedule": "0 22 * * 0-4, * 0-21 * * 1-5, * 22-23 * * 1-4",
+    "timezone": "UTC",
+    "description": "Forex market: Sunday 10 PM - Friday 10 PM UTC"
+  },
+  "is_active": true,
+  "after_hours_available": false
+}
+```
+
 ### WebSocket Interface
 
 For real-time updates, connect to the WebSocket endpoint and subscribe to the assets channel.
@@ -182,6 +286,17 @@ Subscribe to specific assets in a category:
   "category": "crypto",
   "assets": ["BTC-USD", "ETH-USD", "SOL-USD"],
   "include_pricing": true
+}
+```
+
+Subscribe with verbose mode for trading hours:
+
+```json
+{
+  "action": "subscribe",
+  "channel": "assets",
+  "category": "equity",
+  "verbose": true
 }
 ```
 
@@ -233,6 +348,9 @@ The server will push updates whenever asset prices change:
 | `decimals` | integer | Number of decimal places to apply to the mantissa |
 | `timestamp_ms` | integer | Unix timestamp in milliseconds |
 | `api_pricing` | object | Optional API usage pricing (when `include_pricing=true`) |
+| `active_hours` | object | Optional trading hours information (when `verbose=true`) |
+| `is_active` | boolean | Optional current trading status (when `verbose=true`) |
+| `after_hours_available` | boolean | Optional after-hours trading availability (when `verbose=true`) |
 
 ### API Pricing Object Fields
 
@@ -240,6 +358,14 @@ The server will push updates whenever asset prices change:
 |-------|------|-------------|
 | `per_request_usd` | string | Cost per API request in USD |
 | `monthly_subscription_usd` | string | Monthly subscription cost in USD for unlimited access to this asset |
+
+### Active Hours Object Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schedule` | string | Cron expression for trading hours (minute hour day month weekday) |
+| `timezone` | string | Timezone for the cron schedule (e.g., "UTC", "America/New_York") |
+| `description` | string | Human-readable description of the schedule |
 
 ## Price Calculation
 
@@ -276,14 +402,43 @@ interface Asset {
     per_request_usd: string;
     monthly_subscription_usd: string;
   };
+  active_hours?: {
+    schedule: string;
+    timezone: string;
+    description: string;
+  };
+  is_active?: boolean;
+  after_hours_available?: boolean;
 }
 
 interface AssetsResponse {
   assets: Asset[];
 }
 
+interface AssetsRequest {
+  category: string;
+  assets?: string[];
+  include_pricing?: boolean;
+  verbose?: boolean;
+}
+
+interface AssetRequest {
+  asset_name: string;
+  category: string;
+  include_pricing?: boolean;
+  verbose?: boolean;
+}
+
 // Get all crypto assets (category is required)
-const response = await fetch('https://api.example.com/api/assets?category=crypto');
+const response = await fetch('https://api.example.com/api/assets', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    category: 'crypto'
+  } as AssetsRequest)
+});
 const data: AssetsResponse = await response.json();
 
 data.assets.forEach((asset) => {
@@ -292,7 +447,16 @@ data.assets.forEach((asset) => {
 });
 
 // Get crypto assets with pricing information
-const pricingResponse = await fetch('https://api.example.com/api/assets?category=crypto&include_pricing=true');
+const pricingResponse = await fetch('https://api.example.com/api/assets', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    category: 'crypto',
+    include_pricing: true
+  } as AssetsRequest)
+});
 const dataWithPricing: AssetsResponse = await pricingResponse.json();
 
 dataWithPricing.assets.forEach((asset) => {
@@ -305,7 +469,16 @@ dataWithPricing.assets.forEach((asset) => {
 });
 
 // Get specific crypto assets
-const selectedResponse = await fetch('https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD');
+const selectedResponse = await fetch('https://api.example.com/api/assets', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    category: 'crypto',
+    assets: ['BTC-USD', 'ETH-USD', 'SOL-USD']
+  } as AssetsRequest)
+});
 const selectedCrypto: AssetsResponse = await selectedResponse.json();
 
 selectedCrypto.assets.forEach((asset) => {
@@ -314,7 +487,17 @@ selectedCrypto.assets.forEach((asset) => {
 });
 
 // Get a single asset with pricing
-const btcResponse = await fetch('https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true');
+const btcResponse = await fetch('https://api.example.com/api/asset', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    asset_name: 'BTC-USD',
+    category: 'crypto',
+    include_pricing: true
+  } as AssetRequest)
+});
 const btcData: Asset = await btcResponse.json();
 
 const btcPrice = parseInt(btcData.price_mantissa) / Math.pow(10, btcData.decimals);
@@ -325,12 +508,46 @@ if (btcData.api_pricing) {
 }
 
 // Get specific stocks
-const stocksResponse = await fetch('https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT');
+const stocksResponse = await fetch('https://api.example.com/api/assets', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    category: 'equity',
+    assets: ['AAPL', 'GOOGL', 'MSFT']
+  } as AssetsRequest)
+});
 const techStocks: AssetsResponse = await stocksResponse.json();
 
 techStocks.assets.forEach((asset) => {
   const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
   console.log(`${asset.name}: $${price.toFixed(2)}`);
+});
+
+// Get assets with verbose mode to see trading hours
+const verboseResponse = await fetch('https://api.example.com/api/assets', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    category: 'equity',
+    verbose: true
+  } as AssetsRequest)
+});
+const verboseData: AssetsResponse = await verboseResponse.json();
+
+verboseData.assets.forEach((asset) => {
+  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  console.log(`${asset.name}: $${price.toFixed(2)}`);
+  if (asset.active_hours) {
+    console.log(`  Schedule: ${asset.active_hours.schedule}`);
+    console.log(`  Timezone: ${asset.active_hours.timezone}`);
+    console.log(`  Hours: ${asset.active_hours.description}`);
+    console.log(`  Status: ${asset.is_active ? 'ACTIVE' : 'CLOSED'}`);
+    console.log(`  After-hours: ${asset.after_hours_available ? 'Available' : 'Not available'}`);
+  }
 });
 ```
 
@@ -348,6 +565,13 @@ interface Asset {
     per_request_usd: string;
     monthly_subscription_usd: string;
   };
+  active_hours?: {
+    schedule: string;
+    timezone: string;
+    description: string;
+  };
+  is_active?: boolean;
+  after_hours_available?: boolean;
 }
 
 interface AssetsMessage {
@@ -370,6 +594,7 @@ interface SubscriptionRequest {
   assets?: string[];
   asset?: string;
   include_pricing?: boolean;
+  verbose?: boolean;
 }
 
 const ws = new WebSocket('wss://api.example.com/ws/assets');
