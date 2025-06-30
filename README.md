@@ -24,7 +24,7 @@ Returns a snapshot of available assets with current pricing and metadata for a s
 {
   "category": "crypto",
   "assets": ["BTC-USD", "ETH-USD"],  // Optional
-  "include_pricing": true,            // Optional
+  "includePricing": true,            // Optional
   "verbose": true                     // Optional
 }
 ```
@@ -35,7 +35,7 @@ Returns a snapshot of available assets with current pricing and metadata for a s
 |-----------|------|-------------|----------|
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
 | `assets` | string[] | Array of specific assets to retrieve | No |
-| `include_pricing` | boolean | Include API usage pricing information | No |
+| `includePricing` | boolean | Include API usage pricing information | No |
 | `verbose` | boolean | Include trading hours and active status information | No |
 
 **Example Requests:**
@@ -54,7 +54,7 @@ POST https://api.example.com/api/assets
 {
   "category": "crypto",
   "assets": ["BTC-USD", "ETH-USD", "SOL-USD"],
-  "include_pricing": true
+  "includePricing": true
 }
 ```
 
@@ -72,10 +72,10 @@ Returns pricing and metadata for a specific asset.
 
 ```json
 {
-  "asset_name": "BTC-USD",
+  "assetName": "BTC-USD",
   "category": "crypto",
-  "include_pricing": true,  // Optional
-  "verbose": true           // Optional
+  "includePricing": true,  // Optional
+  "verbose": true          // Optional
 }
 ```
 
@@ -83,9 +83,9 @@ Returns pricing and metadata for a specific asset.
 
 | Parameter | Type | Description | Required |
 |-----------|------|-------------|----------|
-| `asset_name` | string | Asset symbol or name (e.g., "BTC-USD", "ETH-USD") | **Yes** |
+| `assetName` | string | Asset symbol or name (e.g., "BTC-USD", "ETH-USD") | **Yes** |
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
-| `include_pricing` | boolean | Include API usage pricing information | No |
+| `includePricing` | boolean | Include API usage pricing information | No |
 | `verbose` | boolean | Include trading hours and active status information | No |
 
 **Example Requests:**
@@ -94,7 +94,7 @@ Bitcoin:
 ```json
 POST https://api.example.com/api/asset
 {
-  "asset_name": "BTC-USD",
+  "assetName": "BTC-USD",
   "category": "crypto"
 }
 ```
@@ -103,9 +103,9 @@ Bitcoin with pricing:
 ```json
 POST https://api.example.com/api/asset
 {
-  "asset_name": "BTC-USD",
+  "assetName": "BTC-USD",
   "category": "crypto",
-  "include_pricing": true
+  "includePricing": true
 }
 ```
 
@@ -117,16 +117,16 @@ POST https://api.example.com/api/asset
     {
       "name": "BTC/USD",
       "category": "crypto",
-      "price_mantissa": "6342000000",
+      "priceMantissa": "6342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800123
+      "timestampMs": 1719964800123
     },
     {
       "name": "ETH/USD",
       "category": "crypto",
-      "price_mantissa": "342000000",
+      "priceMantissa": "342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800456
+      "timestampMs": 1719964800456
     }
   ]
 }
@@ -140,23 +140,23 @@ POST https://api.example.com/api/asset
     {
       "name": "BTC/USD",
       "category": "crypto",
-      "price_mantissa": "6342000000",
+      "priceMantissa": "6342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800123,
-      "api_pricing": {
-        "per_request_usd": "0.0001",
-        "monthly_subscription_usd": "99.99"
+      "timestampMs": 1719964800123,
+      "apiPricing": {
+        "perRequestUsd": "0.0001",
+        "monthlySubscriptionUsd": "99.99"
       }
     },
     {
       "name": "ETH/USD",
       "category": "crypto",
-      "price_mantissa": "342000000",
+      "priceMantissa": "342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800456,
-      "api_pricing": {
-        "per_request_usd": "0.0001",
-        "monthly_subscription_usd": "99.99"
+      "timestampMs": 1719964800456,
+      "apiPricing": {
+        "perRequestUsd": "0.0001",
+        "monthlySubscriptionUsd": "99.99"
       }
     }
   ]
@@ -169,9 +169,9 @@ POST https://api.example.com/api/asset
 {
   "name": "BTC/USD",
   "category": "crypto",
-  "price_mantissa": "6342000000",
+  "priceMantissa": "6342000000",
   "decimals": 8,
-  "timestamp_ms": 1719964800123
+  "timestampMs": 1719964800123
 }
 ```
 
@@ -181,12 +181,12 @@ POST https://api.example.com/api/asset
 {
   "name": "BTC/USD",
   "category": "crypto",
-  "price_mantissa": "6342000000",
+  "priceMantissa": "6342000000",
   "decimals": 8,
-  "timestamp_ms": 1719964800123,
-  "api_pricing": {
-    "per_request_usd": "0.0001",
-    "monthly_subscription_usd": "99.99"
+  "timestampMs": 1719964800123,
+  "apiPricing": {
+    "perRequestUsd": "0.0001",
+    "monthlySubscriptionUsd": "99.99"
   }
 }
 ```
@@ -197,16 +197,16 @@ POST https://api.example.com/api/asset
 {
   "name": "BTC/USD",
   "category": "crypto",
-  "price_mantissa": "6342000000",
+  "priceMantissa": "6342000000",
   "decimals": 8,
-  "timestamp_ms": 1719964800123,
-  "active_hours": {
+  "timestampMs": 1719964800123,
+  "activeHours": {
     "schedule": "* * * * *",
     "timezone": "UTC",
     "description": "24/7 trading"
   },
-  "is_active": true,
-  "after_hours_available": false
+  "isActive": true,
+  "afterHoursAvailable": false
 }
 ```
 
@@ -216,16 +216,16 @@ POST https://api.example.com/api/asset
 {
   "name": "AAPL",
   "category": "equity",
-  "price_mantissa": "17500",
+  "priceMantissa": "17500",
   "decimals": 2,
-  "timestamp_ms": 1719964800123,
-  "active_hours": {
+  "timestampMs": 1719964800123,
+  "activeHours": {
     "schedule": "30-59 9 * * 1-5, 0-59 10-15 * * 1-5, 0 16 * * 1-5",
     "timezone": "America/New_York",
     "description": "NYSE hours: 9:30 AM - 4:00 PM ET, Monday-Friday"
   },
-  "is_active": false,
-  "after_hours_available": true
+  "isActive": false,
+  "afterHoursAvailable": true
 }
 ```
 
@@ -235,16 +235,16 @@ POST https://api.example.com/api/asset
 {
   "name": "EUR/USD",
   "category": "forex",
-  "price_mantissa": "108753",
+  "priceMantissa": "108753",
   "decimals": 5,
-  "timestamp_ms": 1719964800123,
-  "active_hours": {
+  "timestampMs": 1719964800123,
+  "activeHours": {
     "schedule": "0 22 * * 0-4, * 0-21 * * 1-5, * 22-23 * * 1-4",
     "timezone": "UTC",
     "description": "Forex market: Sunday 10 PM - Friday 10 PM UTC"
   },
-  "is_active": true,
-  "after_hours_available": false
+  "isActive": true,
+  "afterHoursAvailable": false
 }
 ```
 
@@ -273,7 +273,7 @@ Subscribe with pricing information:
   "action": "subscribe",
   "channel": "assets",
   "category": "crypto",
-  "include_pricing": true
+  "includePricing": true
 }
 ```
 
@@ -285,7 +285,7 @@ Subscribe to specific assets in a category:
   "channel": "assets",
   "category": "crypto",
   "assets": ["BTC-USD", "ETH-USD", "SOL-USD"],
-  "include_pricing": true
+  "includePricing": true
 }
 ```
 
@@ -321,16 +321,16 @@ The server will push updates whenever asset prices change:
     {
       "name": "BTC/USD",
       "category": "crypto",
-      "price_mantissa": "6342000000",
+      "priceMantissa": "6342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800123
+      "timestampMs": 1719964800123
     },
     {
       "name": "ETH/USD",
       "category": "crypto",
-      "price_mantissa": "342000000",
+      "priceMantissa": "342000000",
       "decimals": 8,
-      "timestamp_ms": 1719964800456
+      "timestampMs": 1719964800456
     }
   ]
 }
@@ -344,20 +344,20 @@ The server will push updates whenever asset prices change:
 |-------|------|-------------|
 | `name` | string | Asset symbol or trading pair (e.g., "BTC/USD") |
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") |
-| `price_mantissa` | string | Integer representation of the price before decimal shifting |
+| `priceMantissa` | string | Integer representation of the price before decimal shifting |
 | `decimals` | integer | Number of decimal places to apply to the mantissa |
-| `timestamp_ms` | integer | Unix timestamp in milliseconds |
-| `api_pricing` | object | Optional API usage pricing (when `include_pricing=true`) |
-| `active_hours` | object | Optional trading hours information (when `verbose=true`) |
-| `is_active` | boolean | Optional current trading status (when `verbose=true`) |
-| `after_hours_available` | boolean | Optional after-hours trading availability (when `verbose=true`) |
+| `timestampMs` | integer | Unix timestamp in milliseconds |
+| `apiPricing` | object | Optional API usage pricing (when `includePricing=true`) |
+| `activeHours` | object | Optional trading hours information (when `verbose=true`) |
+| `isActive` | boolean | Optional current trading status (when `verbose=true`) |
+| `afterHoursAvailable` | boolean | Optional after-hours trading availability (when `verbose=true`) |
 
 ### API Pricing Object Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `per_request_usd` | string | Cost per API request in USD |
-| `monthly_subscription_usd` | string | Monthly subscription cost in USD for unlimited access to this asset |
+| `perRequestUsd` | string | Cost per API request in USD |
+| `monthlySubscriptionUsd` | string | Monthly subscription cost in USD for unlimited access to this asset |
 
 ### Active Hours Object Fields
 
@@ -378,7 +378,7 @@ const floatPrice = parseInt(priceMantissa) / Math.pow(10, decimals);
 ### Example Calculation
 
 For BTC/USD with:
-- `price_mantissa`: "6342000000"
+- `priceMantissa`: "6342000000"
 - `decimals`: 8
 
 ```typescript
@@ -395,20 +395,20 @@ const price = 6342000000 / Math.pow(10, 8);
 interface Asset {
   name: string;
   category: string;
-  price_mantissa: string;
+  priceMantissa: string;
   decimals: number;
-  timestamp_ms: number;
-  api_pricing?: {
-    per_request_usd: string;
-    monthly_subscription_usd: string;
+  timestampMs: number;
+  apiPricing?: {
+    perRequestUsd: string;
+    monthlySubscriptionUsd: string;
   };
-  active_hours?: {
+  activeHours?: {
     schedule: string;
     timezone: string;
     description: string;
   };
-  is_active?: boolean;
-  after_hours_available?: boolean;
+  isActive?: boolean;
+  afterHoursAvailable?: boolean;
 }
 
 interface AssetsResponse {
@@ -418,14 +418,14 @@ interface AssetsResponse {
 interface AssetsRequest {
   category: string;
   assets?: string[];
-  include_pricing?: boolean;
+  includePricing?: boolean;
   verbose?: boolean;
 }
 
 interface AssetRequest {
-  asset_name: string;
+  assetName: string;
   category: string;
-  include_pricing?: boolean;
+  includePricing?: boolean;
   verbose?: boolean;
 }
 
@@ -442,7 +442,7 @@ const response = await fetch('https://api.example.com/api/assets', {
 const data: AssetsResponse = await response.json();
 
 data.assets.forEach((asset) => {
-  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
   console.log(`${asset.name}: $${price.toFixed(2)}`);
 });
 
@@ -454,16 +454,16 @@ const pricingResponse = await fetch('https://api.example.com/api/assets', {
   },
   body: JSON.stringify({
     category: 'crypto',
-    include_pricing: true
+    includePricing: true
   } as AssetsRequest)
 });
 const dataWithPricing: AssetsResponse = await pricingResponse.json();
 
 dataWithPricing.assets.forEach((asset) => {
-  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
-  if (asset.api_pricing) {
-    const apiCost = asset.api_pricing.per_request_usd;
-    const monthly = asset.api_pricing.monthly_subscription_usd;
+  const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
+  if (asset.apiPricing) {
+    const apiCost = asset.apiPricing.perRequestUsd;
+    const monthly = asset.apiPricing.monthlySubscriptionUsd;
     console.log(`${asset.name}: $${price.toFixed(2)} ($${apiCost}/request, $${monthly}/month)`);
   }
 });
@@ -482,7 +482,7 @@ const selectedResponse = await fetch('https://api.example.com/api/assets', {
 const selectedCrypto: AssetsResponse = await selectedResponse.json();
 
 selectedCrypto.assets.forEach((asset) => {
-  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
   console.log(`${asset.name}: $${price.toFixed(2)}`);
 });
 
@@ -493,18 +493,18 @@ const btcResponse = await fetch('https://api.example.com/api/asset', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    asset_name: 'BTC-USD',
+    assetName: 'BTC-USD',
     category: 'crypto',
-    include_pricing: true
+    includePricing: true
   } as AssetRequest)
 });
 const btcData: Asset = await btcResponse.json();
 
-const btcPrice = parseInt(btcData.price_mantissa) / Math.pow(10, btcData.decimals);
+const btcPrice = parseInt(btcData.priceMantissa) / Math.pow(10, btcData.decimals);
 console.log(`Bitcoin: $${btcPrice.toFixed(2)}`);
-if (btcData.api_pricing) {
-  console.log(`  API Cost: $${btcData.api_pricing.per_request_usd}/request`);
-  console.log(`  Monthly: $${btcData.api_pricing.monthly_subscription_usd}`);
+if (btcData.apiPricing) {
+  console.log(`  API Cost: $${btcData.apiPricing.perRequestUsd}/request`);
+  console.log(`  Monthly: $${btcData.apiPricing.monthlySubscriptionUsd}`);
 }
 
 // Get specific stocks
@@ -521,7 +521,7 @@ const stocksResponse = await fetch('https://api.example.com/api/assets', {
 const techStocks: AssetsResponse = await stocksResponse.json();
 
 techStocks.assets.forEach((asset) => {
-  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
   console.log(`${asset.name}: $${price.toFixed(2)}`);
 });
 
@@ -539,14 +539,14 @@ const verboseResponse = await fetch('https://api.example.com/api/assets', {
 const verboseData: AssetsResponse = await verboseResponse.json();
 
 verboseData.assets.forEach((asset) => {
-  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
   console.log(`${asset.name}: $${price.toFixed(2)}`);
-  if (asset.active_hours) {
-    console.log(`  Schedule: ${asset.active_hours.schedule}`);
-    console.log(`  Timezone: ${asset.active_hours.timezone}`);
-    console.log(`  Hours: ${asset.active_hours.description}`);
-    console.log(`  Status: ${asset.is_active ? 'ACTIVE' : 'CLOSED'}`);
-    console.log(`  After-hours: ${asset.after_hours_available ? 'Available' : 'Not available'}`);
+  if (asset.activeHours) {
+    console.log(`  Schedule: ${asset.activeHours.schedule}`);
+    console.log(`  Timezone: ${asset.activeHours.timezone}`);
+    console.log(`  Hours: ${asset.activeHours.description}`);
+    console.log(`  Status: ${asset.isActive ? 'ACTIVE' : 'CLOSED'}`);
+    console.log(`  After-hours: ${asset.afterHoursAvailable ? 'Available' : 'Not available'}`);
   }
 });
 ```
@@ -558,32 +558,32 @@ verboseData.assets.forEach((asset) => {
 interface Asset {
   name: string;
   category: string;
-  price_mantissa: string;
+  priceMantissa: string;
   decimals: number;
-  timestamp_ms: number;
-  api_pricing?: {
-    per_request_usd: string;
-    monthly_subscription_usd: string;
+  timestampMs: number;
+  apiPricing?: {
+    perRequestUsd: string;
+    monthlySubscriptionUsd: string;
   };
-  active_hours?: {
+  activeHours?: {
     schedule: string;
     timezone: string;
     description: string;
   };
-  is_active?: boolean;
-  after_hours_available?: boolean;
+  isActive?: boolean;
+  afterHoursAvailable?: boolean;
 }
 
 interface AssetsMessage {
   assets?: Asset[];
   name?: string;
   category?: string;
-  price_mantissa?: string;
+  priceMantissa?: string;
   decimals?: number;
-  timestamp_ms?: number;
-  api_pricing?: {
-    per_request_usd: string;
-    monthly_subscription_usd: string;
+  timestampMs?: number;
+  apiPricing?: {
+    perRequestUsd: string;
+    monthlySubscriptionUsd: string;
   };
 }
 
@@ -593,7 +593,7 @@ interface SubscriptionRequest {
   category: string;
   assets?: string[];
   asset?: string;
-  include_pricing?: boolean;
+  includePricing?: boolean;
   verbose?: boolean;
 }
 
@@ -613,7 +613,7 @@ ws.onopen = () => {
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto',
-    include_pricing: true
+    includePricing: true
   };
   ws.send(JSON.stringify(subscription2));
   
@@ -623,7 +623,7 @@ ws.onopen = () => {
     channel: 'assets',
     category: 'crypto',
     assets: ['BTC-USD', 'ETH-USD', 'SOL-USD'],
-    include_pricing: true
+    includePricing: true
   };
   ws.send(JSON.stringify(subscription3));
   
@@ -643,12 +643,12 @@ ws.onmessage = (event: MessageEvent) => {
   // Handle array of assets (category or multiple asset subscription)
   if (data.assets) {
     data.assets.forEach((asset) => {
-      const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+      const price = parseInt(asset.priceMantissa) / Math.pow(10, asset.decimals);
       let output = `${asset.name}: $${price.toFixed(2)}`;
       
       // Add pricing info if available
-      if (asset.api_pricing) {
-        output += ` (Cost: $${asset.api_pricing.per_request_usd}/req, $${asset.api_pricing.monthly_subscription_usd}/mo)`;
+      if (asset.apiPricing) {
+        output += ` (Cost: $${asset.apiPricing.perRequestUsd}/req, $${asset.apiPricing.monthlySubscriptionUsd}/mo)`;
       }
       
       console.log(output);
@@ -656,12 +656,12 @@ ws.onmessage = (event: MessageEvent) => {
   }
   
   // Handle single asset update
-  if (data.name && !data.assets && data.price_mantissa && data.decimals !== undefined) {
-    const price = parseInt(data.price_mantissa) / Math.pow(10, data.decimals);
+  if (data.name && !data.assets && data.priceMantissa && data.decimals !== undefined) {
+    const price = parseInt(data.priceMantissa) / Math.pow(10, data.decimals);
     let output = `Update - ${data.name}: $${price.toFixed(2)}`;
     
-    if (data.api_pricing) {
-      output += ` (Cost: $${data.api_pricing.per_request_usd}/req)`;
+    if (data.apiPricing) {
+      output += ` (Cost: $${data.apiPricing.perRequestUsd}/req)`;
     }
     
     console.log(output);
