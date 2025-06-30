@@ -245,8 +245,8 @@ The server will push updates whenever asset prices change:
 
 To convert the mantissa and decimals into a floating-point price:
 
-```python
-float_price = int(price_mantissa) / (10 ** decimals)
+```typescript
+const floatPrice = parseInt(priceMantissa) / Math.pow(10, decimals);
 ```
 
 ### Example Calculation
@@ -255,108 +255,169 @@ For BTC/USD with:
 - `price_mantissa`: "6342000000"
 - `decimals`: 8
 
-```python
-price = 6342000000 / (10 ** 8)
-# Result: 63.42
+```typescript
+const price = 6342000000 / Math.pow(10, 8);
+// Result: 63.42
 ```
 
 ## Integration Examples
 
-### REST API Example (Python)
+### REST API Example (TypeScript)
 
-```python
-import requests
+```typescript
+// Type definitions
+interface Asset {
+  name: string;
+  category: string;
+  price_mantissa: string;
+  decimals: number;
+  timestamp_ms: number;
+  api_pricing?: {
+    per_request_usd: string;
+    monthly_subscription_usd: string;
+  };
+}
 
-# Get all crypto assets (category is required)
-response = requests.get('https://api.example.com/api/assets?category=crypto')
-data = response.json()
+interface AssetsResponse {
+  assets: Asset[];
+}
 
-for asset in data['assets']:
-    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
-    print(f"{asset['name']}: ${price:.2f}")
+// Get all crypto assets (category is required)
+const response = await fetch('https://api.example.com/api/assets?category=crypto');
+const data: AssetsResponse = await response.json();
 
-# Get crypto assets with pricing information
-response = requests.get('https://api.example.com/api/assets?category=crypto&include_pricing=true')
-data_with_pricing = response.json()
+data.assets.forEach((asset) => {
+  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  console.log(`${asset.name}: $${price.toFixed(2)}`);
+});
 
-for asset in data_with_pricing['assets']:
-    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
-    api_cost = asset['api_pricing']['per_request_usd']
-    monthly = asset['api_pricing']['monthly_subscription_usd']
-    print(f"{asset['name']}: ${price:.2f} (${api_cost}/request, ${monthly}/month)")
+// Get crypto assets with pricing information
+const pricingResponse = await fetch('https://api.example.com/api/assets?category=crypto&include_pricing=true');
+const dataWithPricing: AssetsResponse = await pricingResponse.json();
 
-# Get specific crypto assets
-response = requests.get('https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD')
-selected_crypto = response.json()
+dataWithPricing.assets.forEach((asset) => {
+  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  if (asset.api_pricing) {
+    const apiCost = asset.api_pricing.per_request_usd;
+    const monthly = asset.api_pricing.monthly_subscription_usd;
+    console.log(`${asset.name}: $${price.toFixed(2)} ($${apiCost}/request, $${monthly}/month)`);
+  }
+});
 
-for asset in selected_crypto['assets']:
-    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
-    print(f"{asset['name']}: ${price:.2f}")
+// Get specific crypto assets
+const selectedResponse = await fetch('https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD');
+const selectedCrypto: AssetsResponse = await selectedResponse.json();
 
-# Get a single asset with pricing
-response = requests.get('https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true')
-btc_data = response.json()
+selectedCrypto.assets.forEach((asset) => {
+  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  console.log(`${asset.name}: $${price.toFixed(2)}`);
+});
 
-btc_price = int(btc_data['price_mantissa']) / (10 ** btc_data['decimals'])
-if 'api_pricing' in btc_data:
-    print(f"Bitcoin: ${btc_price:.2f}")
-    print(f"  API Cost: ${btc_data['api_pricing']['per_request_usd']}/request")
-    print(f"  Monthly: ${btc_data['api_pricing']['monthly_subscription_usd']}")
+// Get a single asset with pricing
+const btcResponse = await fetch('https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true');
+const btcData: Asset = await btcResponse.json();
 
-# Get specific stocks
-response = requests.get('https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT')
-tech_stocks = response.json()
+const btcPrice = parseInt(btcData.price_mantissa) / Math.pow(10, btcData.decimals);
+console.log(`Bitcoin: $${btcPrice.toFixed(2)}`);
+if (btcData.api_pricing) {
+  console.log(`  API Cost: $${btcData.api_pricing.per_request_usd}/request`);
+  console.log(`  Monthly: $${btcData.api_pricing.monthly_subscription_usd}`);
+}
 
-for asset in tech_stocks['assets']:
-    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
-    print(f"{asset['name']}: ${price:.2f}")
+// Get specific stocks
+const stocksResponse = await fetch('https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT');
+const techStocks: AssetsResponse = await stocksResponse.json();
+
+techStocks.assets.forEach((asset) => {
+  const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
+  console.log(`${asset.name}: $${price.toFixed(2)}`);
+});
 ```
 
-### WebSocket Example (JavaScript)
+### WebSocket Example (TypeScript)
 
-```javascript
+```typescript
+// Type definitions
+interface Asset {
+  name: string;
+  category: string;
+  price_mantissa: string;
+  decimals: number;
+  timestamp_ms: number;
+  api_pricing?: {
+    per_request_usd: string;
+    monthly_subscription_usd: string;
+  };
+}
+
+interface AssetsMessage {
+  assets?: Asset[];
+  name?: string;
+  category?: string;
+  price_mantissa?: string;
+  decimals?: number;
+  timestamp_ms?: number;
+  api_pricing?: {
+    per_request_usd: string;
+    monthly_subscription_usd: string;
+  };
+}
+
+interface SubscriptionRequest {
+  action: 'subscribe';
+  channel: 'assets';
+  category: string;
+  assets?: string[];
+  asset?: string;
+  include_pricing?: boolean;
+}
+
 const ws = new WebSocket('wss://api.example.com/ws/assets');
 
 ws.onopen = () => {
   // Subscribe to all crypto assets
-  ws.send(JSON.stringify({
+  const subscription1: SubscriptionRequest = {
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto'
-  }));
+  };
+  ws.send(JSON.stringify(subscription1));
   
   // Subscribe to crypto assets with pricing info
-  ws.send(JSON.stringify({
+  const subscription2: SubscriptionRequest = {
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto',
     include_pricing: true
-  }));
+  };
+  ws.send(JSON.stringify(subscription2));
   
   // Subscribe to specific crypto assets with pricing
-  ws.send(JSON.stringify({
+  const subscription3: SubscriptionRequest = {
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto',
     assets: ['BTC-USD', 'ETH-USD', 'SOL-USD'],
     include_pricing: true
-  }));
+  };
+  ws.send(JSON.stringify(subscription3));
   
   // Subscribe to specific forex pairs
-  ws.send(JSON.stringify({
+  const subscription4: SubscriptionRequest = {
     action: 'subscribe',
     channel: 'assets',
     category: 'forex',
     assets: ['EUR-USD', 'GBP-USD', 'USD-JPY']
-  }));
+  };
+  ws.send(JSON.stringify(subscription4));
 };
 
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+ws.onmessage = (event: MessageEvent) => {
+  const data: AssetsMessage = JSON.parse(event.data);
   
   // Handle array of assets (category or multiple asset subscription)
   if (data.assets) {
-    data.assets.forEach(asset => {
+    data.assets.forEach((asset) => {
       const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
       let output = `${asset.name}: $${price.toFixed(2)}`;
       
@@ -370,7 +431,7 @@ ws.onmessage = (event) => {
   }
   
   // Handle single asset update
-  if (data.name && !data.assets) {
+  if (data.name && !data.assets && data.price_mantissa && data.decimals !== undefined) {
     const price = parseInt(data.price_mantissa) / Math.pow(10, data.decimals);
     let output = `Update - ${data.name}: $${price.toFixed(2)}`;
     
@@ -380,6 +441,14 @@ ws.onmessage = (event) => {
     
     console.log(output);
   }
+};
+
+ws.onerror = (error: Event) => {
+  console.error('WebSocket error:', error);
+};
+
+ws.onclose = (event: CloseEvent) => {
+  console.log('WebSocket closed:', event.code, event.reason);
 };
 ```
 
