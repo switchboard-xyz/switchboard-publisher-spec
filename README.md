@@ -10,7 +10,7 @@ This API provides real-time and historical asset pricing data with comprehensive
 
 #### Get Asset List
 
-Returns a snapshot of available assets with current pricing and metadata for a specific category.
+Returns a snapshot of available assets with current pricing and metadata for a specific category. Optionally filter to specific assets.
 
 **Endpoint:** `GET /api/assets`
 
@@ -23,12 +23,16 @@ Returns a snapshot of available assets with current pricing and metadata for a s
 | Parameter | Type | Description | Required |
 |-----------|------|-------------|----------|
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
+| `assets` | string | Comma-separated list of specific assets to retrieve | No |
+| `include_pricing` | boolean | Include API usage pricing information | No |
 
 **Example Requests:**
 
-- Crypto assets: `GET https://api.example.com/api/assets?category=crypto`
-- Equity assets: `GET https://api.example.com/api/assets?category=equity`
-- Forex assets: `GET https://api.example.com/api/assets?category=forex`
+- All crypto assets: `GET https://api.example.com/api/assets?category=crypto`
+- Specific crypto assets: `GET https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD`
+- Crypto with pricing: `GET https://api.example.com/api/assets?category=crypto&include_pricing=true`
+- All equity assets: `GET https://api.example.com/api/assets?category=equity`
+- Specific stocks: `GET https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT`
 
 #### Get Specific Asset
 
@@ -49,10 +53,12 @@ Returns pricing and metadata for a specific asset.
 | Parameter | Type | Description | Required |
 |-----------|------|-------------|----------|
 | `category` | string | Asset category (e.g., "crypto", "equity", "forex") | **Yes** |
+| `include_pricing` | boolean | Include API usage pricing information | No |
 
 **Example Requests:**
 
 - Bitcoin: `GET https://api.example.com/api/assets/BTC-USD?category=crypto`
+- Bitcoin with pricing: `GET https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true`
 - Apple Stock: `GET https://api.example.com/api/assets/AAPL?category=equity`
 - EUR/USD: `GET https://api.example.com/api/assets/EUR-USD?category=forex`
 
@@ -79,6 +85,37 @@ Returns pricing and metadata for a specific asset.
 }
 ```
 
+**Response Format (List with Pricing):**
+
+```json
+{
+  "assets": [
+    {
+      "name": "BTC/USD",
+      "category": "crypto",
+      "price_mantissa": "6342000000",
+      "decimals": 8,
+      "timestamp_ms": 1719964800123,
+      "api_pricing": {
+        "per_request_usd": "0.0001",
+        "monthly_subscription_usd": "99.99"
+      }
+    },
+    {
+      "name": "ETH/USD",
+      "category": "crypto",
+      "price_mantissa": "342000000",
+      "decimals": 8,
+      "timestamp_ms": 1719964800456,
+      "api_pricing": {
+        "per_request_usd": "0.0001",
+        "monthly_subscription_usd": "99.99"
+      }
+    }
+  ]
+}
+```
+
 **Response Format (Single Asset):**
 
 ```json
@@ -91,6 +128,22 @@ Returns pricing and metadata for a specific asset.
 }
 ```
 
+**Response Format (Single Asset with Pricing):**
+
+```json
+{
+  "name": "BTC/USD",
+  "category": "crypto",
+  "price_mantissa": "6342000000",
+  "decimals": 8,
+  "timestamp_ms": 1719964800123,
+  "api_pricing": {
+    "per_request_usd": "0.0001",
+    "monthly_subscription_usd": "99.99"
+  }
+}
+```
+
 ### WebSocket Interface
 
 For real-time updates, connect to the WebSocket endpoint and subscribe to the assets channel.
@@ -99,7 +152,7 @@ For real-time updates, connect to the WebSocket endpoint and subscribe to the as
 
 #### Subscription Request
 
-Subscribe to assets by category (required):
+Subscribe to all assets in a category:
 
 ```json
 {
@@ -109,7 +162,30 @@ Subscribe to assets by category (required):
 }
 ```
 
-Subscribe to a specific asset:
+Subscribe with pricing information:
+
+```json
+{
+  "action": "subscribe",
+  "channel": "assets",
+  "category": "crypto",
+  "include_pricing": true
+}
+```
+
+Subscribe to specific assets in a category:
+
+```json
+{
+  "action": "subscribe",
+  "channel": "assets",
+  "category": "crypto",
+  "assets": ["BTC-USD", "ETH-USD", "SOL-USD"],
+  "include_pricing": true
+}
+```
+
+Subscribe to a single asset:
 
 ```json
 {
@@ -156,6 +232,14 @@ The server will push updates whenever asset prices change:
 | `price_mantissa` | string | Integer representation of the price before decimal shifting |
 | `decimals` | integer | Number of decimal places to apply to the mantissa |
 | `timestamp_ms` | integer | Unix timestamp in milliseconds |
+| `api_pricing` | object | Optional API usage pricing (when `include_pricing=true`) |
+
+### API Pricing Object Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `per_request_usd` | string | Cost per API request in USD |
+| `monthly_subscription_usd` | string | Monthly subscription cost in USD for unlimited access to this asset |
 
 ## Price Calculation
 
@@ -183,7 +267,7 @@ price = 6342000000 / (10 ** 8)
 ```python
 import requests
 
-# Get crypto assets (category is required)
+# Get all crypto assets (category is required)
 response = requests.get('https://api.example.com/api/assets?category=crypto')
 data = response.json()
 
@@ -191,20 +275,41 @@ for asset in data['assets']:
     price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
     print(f"{asset['name']}: ${price:.2f}")
 
-# Get a specific asset
-response = requests.get('https://api.example.com/api/assets/BTC-USD?category=crypto')
+# Get crypto assets with pricing information
+response = requests.get('https://api.example.com/api/assets?category=crypto&include_pricing=true')
+data_with_pricing = response.json()
+
+for asset in data_with_pricing['assets']:
+    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
+    api_cost = asset['api_pricing']['per_request_usd']
+    monthly = asset['api_pricing']['monthly_subscription_usd']
+    print(f"{asset['name']}: ${price:.2f} (${api_cost}/request, ${monthly}/month)")
+
+# Get specific crypto assets
+response = requests.get('https://api.example.com/api/assets?category=crypto&assets=BTC-USD,ETH-USD,SOL-USD')
+selected_crypto = response.json()
+
+for asset in selected_crypto['assets']:
+    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
+    print(f"{asset['name']}: ${price:.2f}")
+
+# Get a single asset with pricing
+response = requests.get('https://api.example.com/api/assets/BTC-USD?category=crypto&include_pricing=true')
 btc_data = response.json()
 
 btc_price = int(btc_data['price_mantissa']) / (10 ** btc_data['decimals'])
-print(f"Bitcoin: ${btc_price:.2f}")
+if 'api_pricing' in btc_data:
+    print(f"Bitcoin: ${btc_price:.2f}")
+    print(f"  API Cost: ${btc_data['api_pricing']['per_request_usd']}/request")
+    print(f"  Monthly: ${btc_data['api_pricing']['monthly_subscription_usd']}")
 
-# Get equity assets
-response = requests.get('https://api.example.com/api/assets?category=equity')
-equity_data = response.json()
+# Get specific stocks
+response = requests.get('https://api.example.com/api/assets?category=equity&assets=AAPL,GOOGL,MSFT')
+tech_stocks = response.json()
 
-for asset in equity_data['assets']:
+for asset in tech_stocks['assets']:
     price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
-    print(f"Stock: {asset['name']}: ${price:.2f}")
+    print(f"{asset['name']}: ${price:.2f}")
 ```
 
 ### WebSocket Example (JavaScript)
@@ -213,37 +318,67 @@ for asset in equity_data['assets']:
 const ws = new WebSocket('wss://api.example.com/ws/assets');
 
 ws.onopen = () => {
-  // Subscribe to crypto category (category is required)
+  // Subscribe to all crypto assets
   ws.send(JSON.stringify({
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto'
   }));
   
-  // Subscribe to a specific asset
+  // Subscribe to crypto assets with pricing info
   ws.send(JSON.stringify({
     action: 'subscribe',
     channel: 'assets',
     category: 'crypto',
-    asset: 'ETH-USD'
+    include_pricing: true
+  }));
+  
+  // Subscribe to specific crypto assets with pricing
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    channel: 'assets',
+    category: 'crypto',
+    assets: ['BTC-USD', 'ETH-USD', 'SOL-USD'],
+    include_pricing: true
+  }));
+  
+  // Subscribe to specific forex pairs
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    channel: 'assets',
+    category: 'forex',
+    assets: ['EUR-USD', 'GBP-USD', 'USD-JPY']
   }));
 };
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   
-  // Handle array of assets (category subscription)
+  // Handle array of assets (category or multiple asset subscription)
   if (data.assets) {
     data.assets.forEach(asset => {
       const price = parseInt(asset.price_mantissa) / Math.pow(10, asset.decimals);
-      console.log(`${asset.name}: $${price.toFixed(2)}`);
+      let output = `${asset.name}: $${price.toFixed(2)}`;
+      
+      // Add pricing info if available
+      if (asset.api_pricing) {
+        output += ` (Cost: $${asset.api_pricing.per_request_usd}/req, $${asset.api_pricing.monthly_subscription_usd}/mo)`;
+      }
+      
+      console.log(output);
     });
   }
   
   // Handle single asset update
   if (data.name && !data.assets) {
     const price = parseInt(data.price_mantissa) / Math.pow(10, data.decimals);
-    console.log(`Update - ${data.name}: $${price.toFixed(2)}`);
+    let output = `Update - ${data.name}: $${price.toFixed(2)}`;
+    
+    if (data.api_pricing) {
+      output += ` (Cost: $${data.api_pricing.per_request_usd}/req)`;
+    }
+    
+    console.log(output);
   }
 };
 ```
