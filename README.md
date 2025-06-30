@@ -10,13 +10,25 @@ This API provides real-time and historical asset pricing data with comprehensive
 
 #### Get Asset List
 
-Returns a snapshot of all available assets with current pricing and metadata.
+Returns a snapshot of available assets with current pricing and metadata. Optionally filter by category.
 
 **Endpoint:** `GET /api/assets`
 
 **Base URL:** `https://api.example.com`
 
 **Full URL:** `https://api.example.com/api/assets`
+
+**Query Parameters:**
+
+| Parameter | Type | Description | Required |
+|-----------|------|-------------|----------|
+| `category` | string | Filter assets by category (e.g., "crypto", "equity", "forex") | No |
+
+**Example Requests:**
+
+- All assets: `GET https://api.example.com/api/assets`
+- Crypto only: `GET https://api.example.com/api/assets?category=crypto`
+- Forex only: `GET https://api.example.com/api/assets?category=forex`
 
 **Response Format:**
 
@@ -49,10 +61,22 @@ For real-time updates, connect to the WebSocket endpoint and subscribe to the as
 
 #### Subscription Request
 
+Subscribe to all assets or filter by category:
+
 ```json
 {
   "action": "subscribe",
   "channel": "assets"
+}
+```
+
+With category filter:
+
+```json
+{
+  "action": "subscribe",
+  "channel": "assets",
+  "category": "crypto"
 }
 ```
 
@@ -119,12 +143,21 @@ price = 6342000000 / (10 ** 8)
 ```python
 import requests
 
+# Get all assets
 response = requests.get('https://api.example.com/api/assets')
 data = response.json()
 
 for asset in data['assets']:
     price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
     print(f"{asset['name']}: ${price:.2f}")
+
+# Get only crypto assets
+response = requests.get('https://api.example.com/api/assets?category=crypto')
+crypto_data = response.json()
+
+for asset in crypto_data['assets']:
+    price = int(asset['price_mantissa']) / (10 ** asset['decimals'])
+    print(f"Crypto: {asset['name']}: ${price:.2f}")
 ```
 
 ### WebSocket Example (JavaScript)
@@ -133,10 +166,18 @@ for asset in data['assets']:
 const ws = new WebSocket('wss://api.example.com/ws/assets');
 
 ws.onopen = () => {
+  // Subscribe to all assets
   ws.send(JSON.stringify({
     action: 'subscribe',
     channel: 'assets'
   }));
+  
+  // Or subscribe to specific category
+  // ws.send(JSON.stringify({
+  //   action: 'subscribe',
+  //   channel: 'assets',
+  //   category: 'equity'
+  // }));
 };
 
 ws.onmessage = (event) => {
